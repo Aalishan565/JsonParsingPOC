@@ -22,11 +22,11 @@ import java.net.URL;
 
 public class MainActivity extends AppCompatActivity {
 
-    TextView mTvJsonData;
-    Button mBtnHitMe;
-    HttpURLConnection connection = null;
-    BufferedReader reader = null;
-    ProgressDialog pd;
+    private TextView mTvJsonData;
+    private Button mBtnHitMe;
+    private HttpURLConnection connection = null;
+    private BufferedReader reader = null;
+    private ProgressDialog pd;
 
 
     @Override
@@ -34,13 +34,12 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         pd = new ProgressDialog(MainActivity.this);
-
         mTvJsonData = (TextView) findViewById(R.id.tv_json_data);
         mBtnHitMe = (Button) findViewById(R.id.btn_hit);
         mBtnHitMe.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                new MyAsyncTask().execute();
+                new DownloadMovieAsyncTask().execute();
             }
 
 
@@ -48,7 +47,7 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-    private class MyAsyncTask extends AsyncTask<String, String, String> {
+    private class DownloadMovieAsyncTask extends AsyncTask<String, String, String> {
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
@@ -70,15 +69,15 @@ public class MainActivity extends AppCompatActivity {
                     buffer.append(line);
 
                 }
-                String finalData= buffer.toString();
-                JSONObject jsonObject= new JSONObject(finalData);
-                JSONArray jsonArray= jsonObject.getJSONArray("movies");
-                StringBuffer finalBuffer= new StringBuffer();
-                for (int i=0;i<jsonArray.length();i++) {
+                String finalData = buffer.toString();
+                JSONObject jsonObject = new JSONObject(finalData);
+                JSONArray jsonArray = jsonObject.getJSONArray("movies");
+                StringBuffer finalBuffer = new StringBuffer();
+                for (int i = 0; i < jsonArray.length(); i++) {
                     JSONObject jsonFinalObject = jsonArray.getJSONObject(i);
                     String movieName = jsonFinalObject.getString("movie");
                     int year = jsonFinalObject.getInt("year");
-                    finalBuffer.append(movieName+"-"+ year+"\n");
+                    finalBuffer.append(movieName + "-" + year + "\n");
                 }
                 return finalBuffer.toString();
 
@@ -108,7 +107,7 @@ public class MainActivity extends AppCompatActivity {
         protected void onPostExecute(String s) {
             super.onPostExecute(s);
             mTvJsonData.setText(s.toString());
-            pd.hide();
+            pd.dismiss();
         }
     }
 
